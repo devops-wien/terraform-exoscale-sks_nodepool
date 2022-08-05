@@ -1,8 +1,3 @@
-variable "size" {
-  description = "(Required) The Noodpool Size."
-  type        = number
-}
-
 variable "cluster_id" {
   description = "(Required) The parent exoscale_sks_cluster ID."
   type        = string
@@ -16,6 +11,11 @@ variable "zone" {
 variable "name" {
   description = "(Required) The SKS node pool name."
   type        = string
+}
+
+variable "size" {
+  description = "(Required) The Noodpool Size."
+  type        = number
 }
 
 variable "instance_type" {
@@ -32,6 +32,7 @@ variable "description" {
 variable "deploy_target_id" {
   description = "A deploy target ID."
   type        = string
+  default     = ""
 }
 
 variable "instance_prefix" {

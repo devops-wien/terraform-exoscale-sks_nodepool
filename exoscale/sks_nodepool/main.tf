@@ -1,10 +1,10 @@
 # https://registry.terraform.io/providers/exoscale/exoscale/latest/docs/resources/sks_nodepool
 resource "exoscale_sks_nodepool" "sks_nodepool" {
-  size                    = var.size
   cluster_id              = var.cluster_id
   zone                    = var.zone
   name                    = var.name
-  instance_type           = var.instance_prefix
+  size                    = var.size
+  instance_type           = var.instance_type
   description             = var.description
   deploy_target_id        = var.deploy_target_id
   instance_prefix         = var.instance_prefix
