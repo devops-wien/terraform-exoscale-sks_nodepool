@@ -15,23 +15,27 @@ variable "cluster_id" {
 }
 
 variable "zone" {
-  description = "(Required) The Exoscale Zone name."
+  description = "The Exoscale Zone name."
   type        = string
+  default     = "at-vie-1"
 }
 
 variable "name" {
-  description = "(Required) The SKS node pool name."
+  description = "The SKS node pool name."
   type        = string
+  default     = "sks_nodepool-at-vie-1"
 }
 
 variable "size" {
-  description = "(Required) The Noodpool Size."
+  description = "The Noodpool Size."
   type        = number
+  default     = 1
 }
 
 variable "instance_type" {
-  description = "(Required) - The managed compute instances type (<family>.<size>, e.g. standard.medium; use the Exoscale CLI - exo compute instance-type list - for the list of available types)"
+  description = "The managed compute instances type (<family>.<size>, e.g. standard.medium; use the Exoscale CLI - exo compute instance-type list - for the list of available types)"
   type        = string
+  default     = "standard.small"
 }
 
 variable "description" {
