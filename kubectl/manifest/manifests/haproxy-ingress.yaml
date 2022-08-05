@@ -1,6 +1,7 @@
 # https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/v1.8/deploy/haproxy-ingress.yaml
 ---
 # Fixme use namespace haproxy-controller, currently default
+# kubectl get namespace haproxy-controller -o json | grep -v '"kubernetes"' | kubectl replace --raw "/api/v1/namespaces/haproxy-controller/finalize" -f -
 #apiVersion: v1
 #kind: Namespace
 #metadata:
