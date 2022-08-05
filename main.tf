@@ -24,6 +24,23 @@ module "exoscale_nlb" {
   labels      = var.nlb_labels
 }
 
+module "tls_self_signed_cert" {
+  source       = "./tls"
+  common_name  = var.common_name
+  dns_names    = var.dns_names
+  organization = var.organization
+}
+
+module "kubernetes_secret" {
+  source = "./kubernetes/secret"
+  name   = var.ssl_certificate
+  data   = {
+    "tls.crt" = module.tls_self_signed_cert.cert_pem
+    "tls.key" = module.tls_self_signed_cert.private_key_pem
+  }
+  type = "kubernetes.io/tls"
+}
+
 module "kubectl_manifest" {
   source                                        = "./kubectl/manifest"
   exoscale_loadbalancer_id                      = module.exoscale_nlb.id

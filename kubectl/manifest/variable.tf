@@ -12,3 +12,6 @@ variable "ssl_certificate" {
   description = "(Required) The default ssl certificate."
   type        = string
 }
+
+
+//variable "time_sleep" {}

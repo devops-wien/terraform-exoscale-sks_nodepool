@@ -89,7 +89,6 @@ variable "private_network_ids" {
 variable "security_group_ids" {
   description = "A list of exoscale_security_group (IDs) to be attached to the managed instances."
   type        = list(string)
-  default     = []
 }
 
 # nlb
@@ -134,8 +133,9 @@ variable "cluster_ca_certificate" {
 
 # tls
 variable "ssl_certificate" {
-  description = "(Required) The default ssl certificate."
+  description = "(Required) The default ssl certificate secret name."
   type        = string
+  default     = "default-ssl-certicate"
 }
 
 # tls
