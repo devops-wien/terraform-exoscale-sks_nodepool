@@ -1,0 +1,278 @@
+# https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/v1.8/deploy/haproxy-ingress.yaml
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: haproxy-controller
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: haproxy-kubernetes-ingress
+  namespace: haproxy-controller
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: haproxy-kubernetes-ingress
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - endpoints
+      - nodes
+      - pods
+      - services
+      - namespaces
+      - events
+      - serviceaccounts
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - "extensions"
+      - "networking.k8s.io"
+    resources:
+      - ingresses
+      - ingresses/status
+      - ingressclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - "extensions"
+      - "networking.k8s.io"
+    resources:
+      - ingresses/status
+    verbs:
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - patch
+      - update
+  - apiGroups:
+      - core.haproxy.org
+    resources:
+      - '*'
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+  - apiGroups:
+      - "discovery.k8s.io"
+    resources:
+      - endpointslices
+    verbs:
+      - get
+      - list
+      - watch
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: haproxy-kubernetes-ingress
+  namespace: haproxy-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: haproxy-kubernetes-ingress
+subjects:
+  - kind: ServiceAccount
+    name: haproxy-kubernetes-ingress
+    namespace: haproxy-controller
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haproxy-kubernetes-ingress
+  namespace: haproxy-controller
+data:
+  forwarded-for: "true"
+  ssl-certificate: "default/${ssl_certificate}"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: ingress-default-backend
+  name: haproxy-kubernetes-ingress-default-backend
+  namespace: haproxy-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: ingress-default-backend
+  template:
+    metadata:
+      labels:
+        run: ingress-default-backend
+    spec:
+      containers:
+        - name: ingress-default-backend
+          image: gcr.io/google_containers/defaultbackend:1.0
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: ingress-default-backend
+  name: haproxy-kubernetes-ingress-default-backend
+  namespace: haproxy-controller
+spec:
+  selector:
+    run: ingress-default-backend
+  ports:
+    - name: port-1
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: haproxy-ingress
+  name: haproxy-kubernetes-ingress
+  namespace: haproxy-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: haproxy-ingress
+  template:
+    metadata:
+      labels:
+        run: haproxy-ingress
+    spec:
+      serviceAccountName: haproxy-kubernetes-ingress
+      containers:
+        - name: haproxy-ingress
+          image: haproxytech/kubernetes-ingress
+          args:
+            - --configmap=haproxy-controller/haproxy
+            - --default-backend-service=haproxy-controller/ingress-default-backend
+            - --ingress.class=haproxy
+          securityContext:
+            runAsUser:  1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "50Mi"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 1042
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+            - name: stat
+              containerPort: 1024
+          env:
+            - name: TZ
+              value: "Etc/UTC"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-healthcheck-mode: "https"
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-healthcheck-uri: "/healthz"
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-strategy: round-robin
+    service.beta.kubernetes.io/exoscale-loadbalancer-id: "${exoscale_loadbalancer_id}"
+    service.beta.kubernetes.io/exoscale-loadbalancer-external: "true"
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-instancepool-id: "${exoscale_loadbalancer_service_instancepool_id}"
+  labels:
+    run: haproxy-ingress-https
+  name: haproxy-kubernetes-ingress-https
+  namespace: haproxy-controller
+spec:
+  selector:
+    run: haproxy-ingress
+  type: LoadBalancer
+  ports:
+      - name: https
+        port: 443
+        protocol: TCP
+        targetPort: 443
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-healthcheck-mode: "http"
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-healthcheck-uri: "/healthz"
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-strategy: round-robin
+    service.beta.kubernetes.io/exoscale-loadbalancer-id: "${exoscale_loadbalancer_id}"
+    service.beta.kubernetes.io/exoscale-loadbalancer-external: "true"
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-instancepool-id: "${exoscale_loadbalancer_service_instancepool_id}"
+  labels:
+    run: haproxy-ingress-http
+  name: haproxy-kubernetes-ingress-http
+  namespace: haproxy-controller
+spec:
+  selector:
+    run: haproxy-ingress
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-healthcheck-mode: "tcp"
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-strategy: round-robin
+    service.beta.kubernetes.io/exoscale-loadbalancer-id: "${exoscale_loadbalancer_id}"
+    service.beta.kubernetes.io/exoscale-loadbalancer-external: "true"
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-instancepool-id: "${exoscale_loadbalancer_service_instancepool_id}"
+  labels:
+    run: haproxy-ingress-stat
+  name: haproxy-kubernetes-ingress-stat
+  namespace: haproxy-controller
+spec:
+  selector:
+    run: haproxy-ingress
+  type: LoadBalancer
+  ports:
+    - name: stat
+      port: 1024
+      protocol: TCP
+      targetPort: 1024

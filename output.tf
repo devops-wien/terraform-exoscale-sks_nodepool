@@ -27,3 +27,37 @@ output "version" {
   description = "The managed instances version."
   value       = module.exoscale_sks_nodepool.version
 }
+
+# nlb
+output "nlb_id" {
+  description = "The network load balancer (NLB) ID."
+  value       = module.exoscale_nlb.id
+}
+
+output "nlb_created_at" {
+  description = "The NLB creation date."
+  value       = module.exoscale_nlb.created_at
+}
+
+output "nlb_ip_address" {
+  description = "The NLB IPv4 address."
+  value       = module.exoscale_nlb.ip_address
+}
+
+output "nlb_services" {
+  description = "The list of the exoscale_nlb_service (names)."
+  value       = module.exoscale_nlb.services
+}
+
+output "nlb_state" {
+  description = "The current NLB state."
+  value       = module.exoscale_nlb.state
+}
+
+# nlb_service
+/* Currently not in use, handled by ingress controller
+output "nlb_service_id" {
+  description = "The NLB service ID."
+  value       = module.exoscale_nlb_service.id
+}
+*/
