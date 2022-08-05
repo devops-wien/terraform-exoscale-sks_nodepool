@@ -1,16 +1,17 @@
 # https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/v1.8/deploy/haproxy-ingress.yaml
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: haproxy-controller
+# Fixme use namespace haproxy-controller, currently default
+#apiVersion: v1
+#kind: Namespace
+#metadata:
+#  name: default
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: haproxy-kubernetes-ingress
-  namespace: haproxy-controller
+  namespace: default
 
 ---
 kind: ClusterRole
@@ -84,7 +85,7 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: haproxy-kubernetes-ingress
-  namespace: haproxy-controller
+  namespace: default
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -92,14 +93,14 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: haproxy-kubernetes-ingress
-    namespace: haproxy-controller
+    namespace: default
 
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: haproxy-kubernetes-ingress
-  namespace: haproxy-controller
+  namespace: default
 data:
   forwarded-for: "true"
   ssl-certificate: "default/${ssl_certificate}"
@@ -111,7 +112,7 @@ metadata:
   labels:
     run: ingress-default-backend
   name: haproxy-kubernetes-ingress-default-backend
-  namespace: haproxy-controller
+  namespace: default
 spec:
   replicas: 1
   selector:
@@ -135,7 +136,7 @@ metadata:
   labels:
     run: ingress-default-backend
   name: haproxy-kubernetes-ingress-default-backend
-  namespace: haproxy-controller
+  namespace: default
 spec:
   selector:
     run: ingress-default-backend
@@ -152,7 +153,7 @@ metadata:
   labels:
     run: haproxy-ingress
   name: haproxy-kubernetes-ingress
-  namespace: haproxy-controller
+  namespace: default
 spec:
   replicas: 1
   selector:
@@ -168,9 +169,9 @@ spec:
         - name: haproxy-ingress
           image: haproxytech/kubernetes-ingress
           args:
-            - --configmap=haproxy-controller/haproxy
-            - --default-backend-service=haproxy-controller/ingress-default-backend
-            - --ingress.class=haproxy
+            - --configmap=default/haproxy-kubernetes-ingress
+            - --default-backend-service=default/haproxy-kubernetes-ingress-default-backend
+            - --ingress.class=default
           securityContext:
             runAsUser:  1000
             runAsGroup: 1000
@@ -219,7 +220,7 @@ metadata:
   labels:
     run: haproxy-ingress-https
   name: haproxy-kubernetes-ingress-https
-  namespace: haproxy-controller
+  namespace: default
 spec:
   selector:
     run: haproxy-ingress
@@ -234,7 +235,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    service.beta.kubernetes.io/exoscale-loadbalancer-service-healthcheck-mode: "http"
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-healthcheck-mode: "https"
     service.beta.kubernetes.io/exoscale-loadbalancer-service-healthcheck-uri: "/healthz"
     service.beta.kubernetes.io/exoscale-loadbalancer-service-strategy: round-robin
     service.beta.kubernetes.io/exoscale-loadbalancer-id: "${exoscale_loadbalancer_id}"
@@ -243,7 +244,7 @@ metadata:
   labels:
     run: haproxy-ingress-http
   name: haproxy-kubernetes-ingress-http
-  namespace: haproxy-controller
+  namespace: default
 spec:
   selector:
     run: haproxy-ingress
@@ -258,7 +259,8 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    service.beta.kubernetes.io/exoscale-loadbalancer-service-healthcheck-mode: "tcp"
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-healthcheck-mode: "http"
+    service.beta.kubernetes.io/exoscale-loadbalancer-service-healthcheck-uri: "/healthz"
     service.beta.kubernetes.io/exoscale-loadbalancer-service-strategy: round-robin
     service.beta.kubernetes.io/exoscale-loadbalancer-id: "${exoscale_loadbalancer_id}"
     service.beta.kubernetes.io/exoscale-loadbalancer-external: "true"
@@ -266,7 +268,7 @@ metadata:
   labels:
     run: haproxy-ingress-stat
   name: haproxy-kubernetes-ingress-stat
-  namespace: haproxy-controller
+  namespace: default
 spec:
   selector:
     run: haproxy-ingress

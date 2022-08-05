@@ -17,7 +17,8 @@ data "kubectl_path_documents" "docs" {
   }
 }
 
-resource "kubectl_manifest" "haproxy-ingress" {
-  count     = length(lookup(data.kubectl_path_documents.docs-count, "documents", 0))
-  yaml_body = element(lookup(data.kubectl_path_documents.docs, "documents", []), count.index)
+resource "kubectl_manifest" "manifest" {
+  count     = length(lookup(data.kubectl_path_documents.documents-count, "documents", 0))
+  yaml_body = element(lookup(data.kubectl_path_documents.documents, "documents", []), count.index)
+  wait      = true
 }
