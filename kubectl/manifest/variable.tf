@@ -13,5 +13,7 @@ variable "ssl_certificate" {
   type        = string
 }
 
-
-//variable "time_sleep" {}
+variable "email" {
+  description = "(Required) E-Mail address for Lets Encrypt."
+  type        = string
+}

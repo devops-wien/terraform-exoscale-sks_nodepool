@@ -13,7 +13,7 @@ data "kubectl_path_documents" "documents-count" {
     exoscale_loadbalancer_id                      = ""
     exoscale_loadbalancer_service_instancepool_id = ""
     ssl_certificate                               = ""
-    #    namespace                                     = ""
+    email                                         = ""
   }
 }
 
@@ -23,7 +23,7 @@ data "kubectl_path_documents" "documents" {
     exoscale_loadbalancer_id                      = var.exoscale_loadbalancer_id
     exoscale_loadbalancer_service_instancepool_id = var.exoscale_loadbalancer_service_instancepool_id
     ssl_certificate                               = var.ssl_certificate
-    #    namespace                                     = kubernetes_namespace.haproxy-controller.id
+    email                                         = var.email
   }
 }
 
