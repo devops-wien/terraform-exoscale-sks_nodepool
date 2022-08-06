@@ -2,7 +2,7 @@ module "exoscale_sks_nodepool" {
   source                  = "./exoscale/sks_nodepool"
   cluster_id              = var.cluster_id
   zone                    = var.zone
-  name                    = var.name
+  name                    = local.name
   size                    = var.size
   instance_type           = var.instance_type
   description             = var.description
@@ -19,7 +19,7 @@ module "exoscale_sks_nodepool" {
 module "exoscale_nlb" {
   source      = "./exoscale/nlb"
   zone        = var.zone
-  name        = var.nlb_name
+  name        = local.nlb_name
   description = var.nlb_description
   labels      = var.nlb_labels
 }
