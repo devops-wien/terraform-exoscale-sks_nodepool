@@ -135,7 +135,7 @@ variable "cluster_ca_certificate" {
 variable "ssl_certificate" {
   description = "(Required) The default ssl certificate secret name."
   type        = string
-  default     = "default-ssl-certicate"
+  default     = "default-ssl-certificate"
 }
 
 # tls
