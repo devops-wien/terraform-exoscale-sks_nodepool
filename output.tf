@@ -53,3 +53,8 @@ output "nlb_state" {
   description = "The current NLB state."
   value       = module.exoscale_nlb.state
 }
+
+output "sks-security-group-id" {
+  value       = module.exoscale_security_group.id
+  description = "The security group ID."
+}
