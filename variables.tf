@@ -131,6 +131,12 @@ variable "cluster_ca_certificate" {
   type        = string
 }
 
+variable "email" {
+  description = "E-Mail address for Lets Encrypt."
+  type        = string
+  default     = "example@example.org"
+}
+
 # tls
 variable "ssl_certificate" {
   description = "(Required) The default ssl certificate secret name."
@@ -141,18 +147,18 @@ variable "ssl_certificate" {
 # tls
 variable "common_name" {
   description = "Distinguished name: CN"
-  type = string
-  default = "Default Common-Name"
+  type        = string
+  default     = "Default Common-Name"
 }
 
 variable "dns_names" {
   description = "List of DNS names for which a certificate is being requested (i.e. certificate subjects)."
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
 }
 
 variable "organization" {
   description = "Distinguished name: O"
-  type = string
-  default = "Default Organization-Name"
+  type        = string
+  default     = "Default Organization-Name"
 }

@@ -46,6 +46,7 @@ module "kubectl_manifest" {
   exoscale_loadbalancer_id                      = module.exoscale_nlb.id
   exoscale_loadbalancer_service_instancepool_id = module.exoscale_sks_nodepool.instance_pool_id
   ssl_certificate                               = var.ssl_certificate
+  email                                         = var.email
 }
 
 /* Currently not in use, handled by ingress controller
