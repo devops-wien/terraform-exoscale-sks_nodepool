@@ -162,3 +162,8 @@ variable "organization" {
   type        = string
   default     = "Default Organization-Name"
 }
+
+variable "prefix_name" {
+  description = "Prefix-Name"
+  default = "sks"
+}
