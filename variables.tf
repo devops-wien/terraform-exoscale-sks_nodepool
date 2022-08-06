@@ -23,7 +23,7 @@ variable "zone" {
 variable "name" {
   description = "The SKS node pool name."
   type        = string
-  default     = "sks_nodepool-at-vie-1"
+  default     = ""
 }
 
 variable "size" {
@@ -41,7 +41,7 @@ variable "instance_type" {
 variable "description" {
   description = "A free-form text describing the pool."
   type        = string
-  default     = "SKS Nodepool"
+  default     = "Managed by Terraform"
 }
 
 variable "deploy_target_id" {
@@ -101,7 +101,7 @@ variable "nlb_name" {
 variable "nlb_description" {
   description = "A free-form text describing the NLB."
   type        = string
-  default     = "SKS NLB"
+  default     = "Managed by Terraform"
 }
 
 variable "nlb_labels" {
