@@ -86,11 +86,6 @@ variable "private_network_ids" {
   default     = []
 }
 
-variable "security_group_ids" {
-  description = "A list of exoscale_security_group (IDs) to be attached to the managed instances."
-  type        = list(string)
-}
-
 # nlb
 variable "nlb_name" {
   description = "The network load balancer (NLB) name."
@@ -166,4 +161,10 @@ variable "organization" {
 variable "prefix_name" {
   description = "Prefix-Name"
   default = "sks"
+}
+
+variable "external_sources" {
+  description = "A list of external network sources, in CIDR notation."
+  type        = list(string)
+  default     = []
 }

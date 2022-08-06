@@ -1,5 +1,23 @@
+resource "time_sleep" "destroy_sks_nodepool" {
+  depends_on       = [module.exoscale_security_group]
+  destroy_duration = "60s"
+}
+
+module "exoscale_security_group" {
+  source           = "./exoscale/security_group"
+  description      = var.description
+  external_sources = var.external_sources
+  name             = local.name
+}
+
+module "security_group_rule" {
+  source            = "./exoscale/security_group_rule"
+  security_group_id = module.exoscale_security_group.id
+}
+
 module "exoscale_sks_nodepool" {
   source                  = "./exoscale/sks_nodepool"
+  depends_on              = [time_sleep.destroy_sks_nodepool]
   cluster_id              = var.cluster_id
   zone                    = var.zone
   name                    = local.name
@@ -13,7 +31,7 @@ module "exoscale_sks_nodepool" {
   taints                  = var.taints
   anti_affinity_group_ids = var.anti_affinity_group_ids
   private_network_ids     = var.private_network_ids
-  security_group_ids      = var.security_group_ids
+  security_group_ids      = [module.exoscale_security_group.id]
 }
 
 module "exoscale_nlb" {
