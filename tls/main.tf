@@ -4,7 +4,6 @@ resource "tls_private_key" "default" {
 }
 
 resource "tls_self_signed_cert" "default" {
-  key_algorithm   = tls_private_key.default.algorithm
   private_key_pem = tls_private_key.default.private_key_pem
 
   subject {
