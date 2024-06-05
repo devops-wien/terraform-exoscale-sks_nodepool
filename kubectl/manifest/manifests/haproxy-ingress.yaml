@@ -136,7 +136,8 @@ metadata:
   name: haproxy-kubernetes-ingress
   namespace: default
 data:
-
+  forwarded-for: "true"
+  ssl-certificate: "default/${ssl_certificate}"
 ---
 apiVersion: apps/v1
 kind: Deployment
